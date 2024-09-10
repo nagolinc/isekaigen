@@ -1,0 +1,12 @@
+Write a random plot for a story.
+
+The plot should be a 1-2 sentence hook that 
+gives the name and description of the main character and a strange situation they find themselves in.
+
+output your answer as JSON like so:
+
+{
+  "plot": "Moonbot 9000, a female android, visits a tribe of primitive female amazon warriors who farm dinosaurs"
+}
+
+here are some examples plots:

@@ -1,0 +1,27 @@
+When generating episodes, follow the following steps:
+
+* Give each episode a title and a brief description.
+* In the description be sure to refer to important characters by name
+* each episode must have at least 3 named characters
+
+In general, the episode should have a plot like:
+The character gets dragged into situation for {reason} and must fight {enemy} and at the end they recieve {treasure} or {ally}.
+
+Try to make sure that the plot of the episodes follows logically.  
+For example, if the character gains an ally in one episode, they might fight an old nemesis of that ally in the next episode.
+
+
+here are some example episodes:
+
+Episode 7: "The Spider’s Web"
+
+Description:
+After receiving a cryptic message from a former comrade, Lena, the rogue who once helped Aric in the Whispering Woods, seeks out Elara and Miraella for help. They venture into the Shadow Caves, where Lena believes her old ally Kara has been captured by a powerful spider queen that weaves illusions to trap her prey. Inside the maze-like caverns, they face deadly traps and ambushes from giant spiders. After a tense battle, they defeat the spider queen and free Kara, who decides to join their group, bringing with her a Magical Cloak of Invisibility.
+Episode 8: "The Iron Revenant"
+
+Description:
+With Kara now part of their group, Lena, Elara, and Miraella travel to the Iron Hills, where Kara’s nemesis, the Iron Revenant — an undead warrior bound by dark magic — is terrorizing the local villagers. They enlist the help of Thorne, the dwarf blacksmith from Emberfall, who has knowledge of the revenant’s curse. As they confront the Iron Revenant, they learn that it is fueled by a powerful rune stone. They destroy the rune stone after a fierce battle, releasing the revenant’s soul. In gratitude, the villagers present them with a Runestone of Binding, capable of sealing dark magic.
+Episode 9: "The Sands of Time"
+
+Description:
+When a mysterious sandstorm threatens the desert city of Sumerak, Ahmed asks Seraphina and Gareth for help, knowing they have recently gained powerful artifacts. They arrive to find the storm is no natural phenomenon; it is being summoned by a powerful djinn bound by a twisted wizard named Zahir. The trio battles through the storm to Zahir’s tower, facing sand golems and mirages that test their resolve. After a climactic fight, they manage to break the wizard’s hold over the djinn. The grateful djinn gifts them a Timeglass Talisman, allowing them to briefly rewind time.

@@ -1,0 +1,23 @@
+Convert the list of episodes to JSON formatted like so:
+
+
+{
+    "title": "title of the series",
+    "description": "description of the series",
+    "episodes":[
+        {"title": "title of the episode",
+        "description": "description of the episode",
+        "episode_number": "episode number"},
+        {"title": "title of the episode",
+        "description": "description of the episode",
+        "episode_number": "episode number"},
+        {"title": "title of the episode",
+        "description": "description of the episode",
+        "episode_number": "episode number"},
+        ...
+    ]
+}
+
+IMPORTANT: Follow the input SCRIPT AS CLOSELY AS POSSIBLE.  That means *each* line in the script should have a corresponding script in your JSON
+
+IMPORTANT: Copy the description EXACTLY as it is, don't shorten it or change it in any way.

@@ -1,0 +1,123 @@
+Convert the provided script into a JSON list of shots.
+
+Each shot should contain the following fields:
+*setting, a description of the setting
+*characters: a list of characters in the scene
+*caption: a caption useful for a text-to-image model describing the scene
+*dialogue [optiona] A SINGLE LINE of dialogue from the scene, including the speaker and their gender
+*narration [optional] A SINGLE LINE of narration from the scene
+**generally if a line does not have dialogue, it should have narration
+*sound effect[optional] A SINGLE ONOMATOPOEIA sound effect from the scene
+*cute[optional] A SINGLE EMOTIONAL CUE for the dialogue or narration
+
+When describing shots avoid direct references to the episode or the camera.
+
+DO NOT WRITE: "the episode begins" or "to be continued" or "the camera pans to"
+INSTEAD, directly refer to the action of the characters:
+"the characters approach a distant city" or "the group settles down for the night, nervous but excited" or "the characters are standing in a vast desert"
+
+
+When writing a good caption, try to include the following elements:
+* the name of the subject, followed by a description of their appearance and actions
+ e.g. "Jerry is a 20-something man with short curly black hair and a puffy shirt."
+** include the name, age, hair-color and style, clothing, in EVERY caption
+* a focal object that the character is interacting with.
+  e.g. "a coffee cup sits on the table in front of him."
+* description of the setting
+  e.g. "Jerry and Elaine sit across from each other in a coffee shop."
+
+Here are examples of good captions:
+
+Sam, a middle-aged man with a bushy beard and a red plaid shirt, leans over a dusty book with a magnifying glass. The book's yellowed pages crackle slightly under his touch in the dimly lit corner of an antique shop.
+
+Lena, a petite woman with curly blonde hair and bright green eyes, sips from a steaming cup of tea while tapping on her laptop. The café window beside her reflects the bustling city street outside.
+
+Carlos, a tall man with a shaved head and a tattoo peeking out from his sleeve, holds a paintbrush mid-stroke. An unfinished mural spreads across the brick wall in front of him, surrounded by scattered paint cans.
+
+Mira, a young woman with long black hair tied into a bun, adjusts her climbing harness as she gazes up at the sheer rock face. The sun sets behind her, casting a warm glow on the jagged cliffs.
+
+Raj, an elderly man with a gentle smile and a cane, offers a piece of bread to a flock of pigeons at his feet. The park bench beside him is covered with fallen autumn leaves.
+
+Aric, a broad-shouldered warrior with a scar across his cheek and a fur-lined cloak, swings a massive broadsword at the towering Balrog, its fiery whip crackling through the air. The cavern walls tremble as flames dance along the creature's molten skin, casting shadows on the ancient stone.
+
+Elara, a young sorceress with silver hair flowing like moonlight, raises her staff high, unleashing a torrent of arcane energy that collides with a shadowy wraith. The sky above roars with thunder, and lightning crackles along the battlements of a crumbling, enchanted fortress.
+
+Thorne, a grizzled dwarf with a braided beard and gleaming battle axe, leaps from the battlements toward a giant stone golem. The ground shudders as he brings his axe down, aiming for the glowing runes etched across the creature's chest, in the midst of a chaotic battlefield littered with broken shields and armor.
+
+Lyra, a lithe elf with emerald eyes and a bow strung with enchanted silver, looses an arrow that glows with a faint blue light. The arrow streaks through the night sky, aiming for the heart of a flying dragon, its wings beating against the moonlit clouds, while below, the forest canopy blazes with the fires of battle.
+
+Karn, a muscular barbarian with a wolf pelt draped over his shoulders, grapples with a massive troll, his hands gripping its tusks with unyielding strength. The river beneath them churns wildly as the troll roars in fury, its green skin slick with water, while ancient oaks line the riverbank, shrouded in mist.
+
+
+For example given a script like:
+
+INT. COFFEE SHOP - DAY
+
+Jerry and Elaine sit across from each other in a coffee shop. Jerry is wearing a puffy shirt.
+
+JERRY
+(Excited)
+But I don't wanna be a pirate!
+
+Elaine rolls her eyes.
+
+ELAINE
+(Sarcastic)
+Yeah, that's a real problem for you.
+
+You might output:
+
+{"setting": "INT. COFFEE SHOP - DAY",
+    "characters": [
+        {
+        "name": "Jerry",
+        "description": "Jerry is a 20-something man with short curly black hair and a puffy shirt."
+        }, 
+        {
+        "name": "Elaine",
+        "description": "Elaine is a 19 year old woman with straight brown hair wearing a red dress."
+        },
+        {
+        "name": "Maxie the Barista",
+        "description": "Maxie is an 18 year old woman with short blonde hair she wears a nose ring and a green apron."
+        }
+    ],
+    shots:[
+    {
+        "setting": "INT. COFFEE SHOP - DAY",
+        "characters": ["Jerry", "Elaine"],
+        "caption": "Jerry, a 20-something man with short curly black hair, wears a puffy shirt and sits across from Elaine, a woman with straight brown hair and a skeptical expression, at a small round table. The coffee shop around them is bustling with people chatting and clinking cups.",
+        "narration": "Jerry and Elaine sit across from each other in a coffee shop.",
+        "sound_effect": "the sound of people chatting in the background"
+    },
+    {
+        "setting": "INT. COFFEE SHOP - DAY",
+        "characters": ["Jerry", "Elaine"],
+        "caption": "Jerry, a 20-something man with short curly black hair dressed in a puffy shirt, leans forward over a small round table, looking at Elaine. The coffee shop is filled with the smell of fresh coffee and quiet murmurs.",
+        "dialogue": {
+            "speaker": "Jerry",
+            "gender": "male",
+            "text": "But I don't wanna be a pirate!"
+            "cue": "excited"
+        }
+    },
+    {
+        "setting": "INT. COFFEE SHOP - DAY",
+        "characters": ["Elaine"],
+        "caption": "Close up of Elaine rolling her eyes. Elaine, a 19 year old woman with straight brown hair and a bemused look, rolls her eyes dramatically while leaning back in her chair. The coffee shop’s warm lighting casts a soft glow over her face.",
+        "narration": "Elaine rolls her eyes.",
+        "sound_effect": "background murmuring fades slightly"
+    },
+    {
+        "setting": "INT. COFFEE SHOP - DAY",
+        "characters": ["Elaine",],
+        "caption": "Elaine, a 19 year old woman with straight brown hair wearing a red dress, is smirking. People can be seen chatting in the coffee shot behind her.",
+        "dialogue": {
+        "speaker": "Elaine",
+        "gender": "female",
+        "text": "Yeah, that's a real problem for you."
+        "cue": "sarcastic"
+        }
+    }
+    ]
+}
