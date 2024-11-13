@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Viewer</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+        }
+        #story-container {
+            text-align: center;
+            margin-top: 0px;
+        }
+        #story-image {
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            color: white; /* Set alt text color to white */
+        }
+        #story-text {
+            margin-top: 20px;
+            font-size: 1.2em;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="story-container">
+        <img id="story-image" src="" alt="Story Image">
+        <div id="story-text"></div>
+    </div>
+
+    <script>
+        let audioElement = new Audio();
+        let resultQueue = [];
+        let isFetching = false;
+        let isPlaying = false;
+
+        const QUEUE_SIZE = 10;
+    
+        async function fetchResult() {
+            if (isFetching) {
+                return;
+            }
+            isFetching = true;
+
+            console.log('fetching,queue size:',resultQueue.length)
+            
+            try {
+                console.log('yes, we are fetching')
+                const response = await fetch('/next_result');
+                console.log('fetched')
+                if (!response.ok) {
+                    throw new Error('No more results');
+                }
+                const data = await response.json();
+                resultQueue.push(data);
+    
+                // Start playing if not currently playing
+                if (!isPlaying) {
+                    playNextResult();
+                }
+
+
+                isFetching = false;
+                if (resultQueue.length < QUEUE_SIZE) {
+                    // Start fetching the next result if the queue is empty
+                    console.log('fetching from fetch recursively')
+                    fetchResult();
+                }
+
+            } catch (error) {
+                console.error('Error fetching next result:', error);
+                document.getElementById('story-text').innerText = 'No more results';
+            } finally {
+
+                //console.log('finally')
+                
+            }
+        }
+    
+        function playNextResult() {
+            if (resultQueue.length === 0) {
+                // Start fetching the next result if the queue is empty
+                fetchResult();
+                return;
+            }
+
+            if(resultQueue.length < QUEUE_SIZE) {
+                fetchResult();
+            }
+    
+            isPlaying = true;
+            const data = resultQueue.shift();
+            document.getElementById('story-image').src = data.image;
+            document.getElementById('story-text').innerText = data.text;
+            audioElement.src = data.audio;
+            audioElement.play();
+    
+            // Fetch the next result while the current audio is playing
+            console.log('fetching next result');
+            fetchResult();
+    
+            // Set up an event listener for when the audio ends
+            audioElement.onended = () => {
+                isPlaying = false;
+                // Wait for 5 seconds before playing the next result
+                setTimeout(playNextResult, 0);
+            };
+        }
+    
+        // Start the process by fetching the first result and playing it
+        fetchResult();
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stories</title>
+    <style>
+        .story {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+        }
+        .story img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stories</h1>
+    <div id="stories-container"></div>
+
+    <script>
+        async function fetchStories() {
+            try {
+                const response = await fetch('/get_stories');
+                const stories = await response.json();
+                const container = document.getElementById('stories-container');
+
+                stories.forEach(story => {
+                    const storyDiv = document.createElement('div');
+                    storyDiv.className = 'story';
+
+                    const link = document.createElement('a');
+                    link.href = `/play_story?story_id=${story.story_id}`;
+
+                    const img = document.createElement('img');
+                    img.src = story.image;
+                    img.alt = 'Story Image';
+
+                    const text = document.createElement('p');
+                    text.textContent = story.text;
+
+                    link.appendChild(img);
+                    link.appendChild(text);
+                    storyDiv.appendChild(link);
+                    container.appendChild(storyDiv);
+                });
+            } catch (error) {
+                console.error('Error fetching stories:', error);
+            }
+        }
+
+        // Fetch stories when the page loads
+        window.onload = fetchStories;
+    </script>
+</body>
+</html>

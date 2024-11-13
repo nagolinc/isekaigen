@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Viewer</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+            color: white;
+        }
+        #story-container {
+            text-align: center;
+            margin-top: 0px;
+        }
+        #story-image {
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            position: relative; /* Allow absolute positioning of child elements */
+        }
+        
+        #story-text {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            font-size: 2em;
+            color: white;
+            text-align: center;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* Create black outline */
+            background-color: rgba(0, 0, 0, 0.5); /* Optional: Add semi-transparent background */
+            padding: 10px;
+            box-sizing: border-box;
+            display: block; /* Ensure it is displayed */
+        }
+
+        #storyIntro {
+            width: 100%;
+            height: 200px;
+            font-size: 16px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div id="story-intro-container">
+        <label for="storyIntro">Story Intro:</label>
+        <textarea id="storyIntro" name="storyIntro"></textarea>
+        <button onclick="setStory()">Play</button>
+        <button onclick="randomPlot()">Random Plot</button>
+        Num Episodes: <input type="number" id="numEpisodes" name="numEpisodes" value="4">
+        Auto: <input type="checkbox" id="auto" name="auto" value="auto">
+    </div>
+    
+    
+    
+    
+    <div id="story-container">
+        <img id="story-image" src="" alt="Story Image">
+        <div id="story-text"></div>
+    </div>
+
+
+
+
+    <script>
+        let audioElement = new Audio();
+        let musicElement = new Audio();
+        let resultQueue = [];
+        let isFetching = false;
+        let isPlaying = false;
+        let isPaused= false;
+        let isEnded= false;
+
+        const QUEUE_SIZE = 10;
+
+        async function randomPlot() {
+            try {
+                const response = await fetch('/random_plot');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                document.getElementById('storyIntro').value = data.tagline;
+            } catch (error) {
+                console.error('Error fetching random plot:', error);
+            }
+        }
+
+
+
+    
+        async function fetchResult() {
+
+            if(isEnded){
+                return;
+            }
+
+            if (isFetching) {
+                return;
+            }
+            isFetching = true;
+
+            console.log('fetching,queue size:',resultQueue.length)
+            
+            try {
+                console.log('yes, we are fetching')
+                const response = await fetch('/next_result');
+                console.log('fetched')
+                if (!response.ok) {
+                    throw new Error('No more results');
+                }
+                const data = await response.json();
+                resultQueue.push(data);
+    
+                // Start playing if not currently playing
+                if (!isPlaying && !isPaused) {
+                    playNextResult();
+                }
+
+
+                isFetching = false;
+                if (resultQueue.length < QUEUE_SIZE) {
+                    // Start fetching the next result if the queue is empty
+                    console.log('fetching from fetch recursively')
+                    fetchResult();
+                }
+
+            } catch (error) {
+                console.error('Error fetching next result:', error);
+                document.getElementById('story-text').innerText = 'No more results';
+            } finally {
+
+                //console.log('finally')
+                
+            }
+        }
+    
+        function playNextResult() {
+
+
+            if(isEnded){
+                return;
+            }
+
+            if (resultQueue.length === 0) {
+                // Start fetching the next result if the queue is empty
+                fetchResult();
+                return;
+            }
+
+            if(resultQueue.length < QUEUE_SIZE) {
+                fetchResult();
+            }
+    
+            isPlaying = true;
+            const data = resultQueue.shift();
+            document.getElementById('story-image').src = data.image;
+            document.getElementById('story-text').innerText = data.text;
+            if(data.audio){
+                audioElement.src = data.audio;
+                audioElement.play();
+            }else{
+                setTimeout(playNextResult, 1.0);
+            }
+
+            //play music
+            if(data.music){
+                musicElement.src = data.music;
+                musicElement.play();
+                musicElement.loop = true;
+            }else{
+                //clear src
+                musicElement.src = "";
+                musicElement.pause();
+            }
+    
+            // Fetch the next result while the current audio is playing
+            console.log('fetching next result');
+            fetchResult();
+    
+            // Set up an event listener for when the audio ends
+            audioElement.onended = () => {
+                isPlaying = false;
+
+                //check if data.ended is true
+                if(data.ended){
+                    console.log('story ended')
+                    //show story-intro-container
+                    document.getElementById("story-intro-container").style.display = "block";
+                    isEnded=true;
+                    //clear queue
+                    resultQueue=[];
+
+                    //chedk if auto is checked
+                    if(document.getElementById("auto").checked){
+                        //randomimze then after 10s set story
+                        randomPlot();
+                        setTimeout(setStory, 10000);
+
+                    }
+
+
+                    return;
+                }
+
+                // Wait for 5 seconds before playing the next result
+                setTimeout(playNextResult, 0);
+            };
+        }
+
+
+        async function setStory() {
+
+            //empty the queue
+            resultQueue=[];
+
+
+            isPaused=false;
+            const storyIntro = document.getElementById("storyIntro").value;
+            const num_episodes = document.getElementById("numEpisodes").value;
+            const response = await fetch("/set_story", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ 
+                    story_intro: storyIntro,
+                    num_episodes: num_episodes
+                 })
+
+                
+
+            });
+            const result = await response.json();
+            if (result.status === "success") {
+                
+                //we need to hide story-intro-container
+                document.getElementById("story-intro-container").style.display = "none";
+
+                isEnded=false;
+
+                fetchResult();
+            } else {
+                console.error("Failed to set story");
+            }
+        }
+
+
+        // Function to toggle play/pause
+        function togglePlayPause() {
+
+            //if story intro textarea is focused, do nothing
+            if(document.activeElement.id === "storyIntro"){
+                return;
+            }
+
+            if (isPaused) {
+                audioElement.play();
+                musicElement.play();
+                isPlaying = true;
+                isPaused = false;
+                //hide the input form
+                document.getElementById("story-intro-container").style.display = "none";
+            } else {
+                audioElement.pause();
+                musicElement.pause();
+                isPlaying = false;
+                isPaused = true;
+                //show the input form
+                document.getElementById("story-intro-container").style.display = "block";
+            }
+        }
+
+        // Add event listener for 'p' key press
+        document.addEventListener('keydown', (event) => {
+            if (event.key.toLowerCase() === 'p') {
+                togglePlayPause();
+            }
+        });
+
+        // Start the process by fetching the first result and playing it
+        //fetchResult();
+    </script>
+    
+</body>
+
+</html>
