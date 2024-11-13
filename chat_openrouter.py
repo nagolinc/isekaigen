@@ -15,6 +15,17 @@ def chat(
     json_mode=False,
     max_history=8,
     verbose=False,
+    #model="meta-llama/llama-3.1-405b-instruct",
+    #model="neversleep/llama-3-lumimaid-70b",#really slow, not that good
+    #model="cognitivecomputations/dolphin-mixtral-8x22b",
+    #model="nousresearch/hermes-3-llama-3.1-70b",
+    #model="austism/chronos-hermes-13b",
+    #model="gryphe/mythomax-l2-13b:nitro",
+    #model="neversleep/llama-3.1-lumimaid-8b",
+    model="nousresearch/hermes-3-llama-3.1-405b:extended",
+    #model="neversleep/llama-3-lumimaid-8b:extended",
+    #model="nousresearch/hermes-3-llama-3.1-405b:extended",  # Replace with your chosen model
+    #model="qwen/qwen-2.5-72b-instruct"
 ):
 
     if history is None:
@@ -35,8 +46,7 @@ def chat(
 
     # Prepare the request data
     request_data = {
-        #"model": "nousresearch/hermes-3-llama-3.1-405b:extended",  # Replace with your chosen model
-        "model": "meta-llama/llama-3.1-405b-instruct",
+        "model": model,
         "messages": messages,
         "response_format": response_format,
     }

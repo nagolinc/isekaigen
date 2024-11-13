@@ -200,6 +200,281 @@ def generate_tts(text, savePath='static/samples/', gender="female", voice_id=0, 
         
     return fullPath
 
+male_voices_hosted=open("d:/img/voices/male_voices_uploaded.txt").readlines()
+male_voices_hosted=[line.strip() for line in male_voices_hosted if len(line.strip())]
+female_voices_hosted=open("d:/img/voices/female_voices_uploaded.txt").readlines()
+female_voices_hosted=[line.strip() for line in female_voices_hosted if len(line.strip())]
+
+male_transcripts=open("d:/img/voices/male_transcripts.txt").readlines()
+female_transcripts=open("d:/img/voices/female_transcripts.txt").readlines()
+
+
+import fal_client
+import os
+import requests
+
+
+def on_queue_update(update):
+    if isinstance(update, fal_client.InProgress):
+        for log in update.logs:
+           print(log["message"])
+
+
+def generate_tts_fal(input_text,voice_id=0,gender="female",save_path = "./static/samples"):
+    if gender=="male":
+        index=voice_id%len(male_voices_hosted)
+        voice_file=male_voices_hosted[index]
+        transcript=male_transcripts[index]
+    else:
+        index=voice_id%len(female_voices_hosted)
+        voice_file=female_voices_hosted[index]
+        transcript=female_transcripts[index]
+        
+        
+    print("using voice",voice_file)
+
+
+    result = fal_client.subscribe(
+        "fal-ai/f5-tts",
+        arguments={
+            "gen_text": input_text,
+            "ref_audio_url": voice_file,
+            "ref_text": transcript,
+            "model_type": "F5-TTS",
+            "remove_silence": True
+        },
+        with_logs=True,
+        on_queue_update=on_queue_update,
+    )
+    print(result)
+    
+    url=result['audio_url']['url']
+    
+    filename=url.split("/")[-1]
+    print('saving file',filename,'in',save_path)
+    
+
+    # Create the directory if it doesn't exist
+    os.makedirs(save_path, exist_ok=True)
+
+    # Full path for the saved file
+    file_path = os.path.join(save_path, filename)
+
+    # Download the file and save it
+    response = requests.get(url, stream=True)
+    if response.status_code == 200:
+        with open(file_path, "wb") as file:
+            for chunk in response.iter_content(chunk_size=1024):
+                file.write(chunk)
+        print(f"File downloaded and saved at {file_path}")
+    else:
+        print("Failed to download file:", response.status_code)
+    
+    return file_path
+
+
+
+from fish_audio_sdk import Session, TTSRequest, ReferenceAudio
+
+import os
+fish_api_key=os.environ["FISH_TTS_API_KEY"]
+
+session = Session(fish_api_key)
+
+# Option 1: Using a reference_id
+with open("output1.mp3", "wb") as f:
+    for chunk in session.tts(TTSRequest(
+        reference_id="e58b0d7efca34eb38d5c4985e378abcb",
+        text="four score and seven years ago"
+    )):
+        f.write(chunk)
+
+# Option 2: Using reference audio
+
+
+import datetime
+import random
+
+
+import glob
+male_voices=glob.glob("d:/img/voices/male/normal/*.wav")
+female_voices=glob.glob("d:/img/voices/female/normal/*.wav")
+
+def generate_filename(extension="mp3"):
+    # Get the current datetime
+    now = datetime.datetime.now()
+    # Format the datetime as a string
+    datetime_str = now.strftime("%Y%m%d%H%M%S")
+    # Generate a random number
+    random_number = random.randint(1000, 9999)
+    # Combine the parts to create the filename
+    filename = f"{datetime_str}-img-{random_number}.{extension}"
+    return filename
+
+
+from pydub import AudioSegment
+from pydub.silence import detect_nonsilent
+import os
+
+def remove_silence(audio_path, silence_thresh=-40, min_silence_len=500, padding=200):
+    # Load audio file
+    audio = AudioSegment.from_file(audio_path)
+    
+    # Detect non-silent chunks
+    nonsilent_chunks = detect_nonsilent(audio, min_silence_len=min_silence_len, silence_thresh=silence_thresh)
+    
+    # Combine non-silent chunks
+    output_audio = AudioSegment.empty()
+    for start, end in nonsilent_chunks:
+        # Add a bit of padding if needed
+        output_audio += audio[start - padding:end + padding]
+    
+    return output_audio
+
+
+
+from pydub.silence import detect_silence
+
+def trim_silence_end(audio_path, silence_threshold=-50.0, silence_duration=1000):
+    # Load the audio file
+    audio = AudioSegment.from_file(audio_path)
+    
+    # Detect silence (returns a list of [start, end] in ms)
+    silence_regions = detect_silence(audio, min_silence_len=silence_duration, silence_thresh=silence_threshold)
+
+    # If there's silence at the end, remove it
+    if silence_regions and silence_regions[-1][1] == len(audio):
+        end_of_audio = silence_regions[-1][0]
+        trimmed_audio = audio[:end_of_audio]
+    else:
+        trimmed_audio = audio  # No silence detected at the end
+
+    # Save the trimmed audio
+    #trimmed_audio.export("trimmed_output.wav", format="wav")
+    print("Silence trimmed and saved as 'trimmed_output.wav'.")
+    return trimmed_audio
+
+
+
+
+def tts_fish(input_text,voice_id=0,gender='female',save_path="static/samples/"):
+    if gender=='male':
+        voice=male_voices[voice_id%len(male_voices)]
+    else:
+        voice=female_voices[voice_id%len(female_voices)]
+    txt_file=voice.replace(".wav","_transcript.txt")
+    
+    
+    output_file=generate_filename()
+    
+    full_path=os.path.join(save_path,output_file)
+
+    with open(voice, "rb") as audio_file:
+        with open(full_path, "wb") as f:
+            for chunk in session.tts(TTSRequest(
+                text=input_text,
+                references=[
+                    ReferenceAudio(
+                        audio=audio_file.read(),
+                        text=open(txt_file).read(),
+                    )
+                ]
+            )):
+                f.write(chunk)
+                
+    #return full_path
+    
+    #now we need to remove silence
+    #output_audio = remove_silence(full_path)
+    output_audio=trim_silence_end(full_path)
+    new_filename=full_path.replace(".mp3","_trimmed.mp3")
+    output_audio.export(new_filename, format="mp3")
+    
+    return new_filename
+
+
+
+
+
+
+
+
+
+def generate_filename(extension="mp3"):
+    # Get the current datetime
+    now = datetime.datetime.now()
+    # Format the datetime as a string
+    datetime_str = now.strftime("%Y%m%d%H%M%S")
+    # Generate a random number
+    random_number = random.randint(1000, 9999)
+    # Combine the parts to create the filename
+    filename = f"{datetime_str}-img-{random_number}.{extension}"
+    return filename
+
+
+import os
+import requests
+import datetime
+import random
+
+import torch
+from scipy.io.wavfile import write
+
+def save_audio(output, filename):
+    # Move tensor to CPU if necessary and detach it from any computational graph
+    audio_tensor = output.audio.cpu().detach().numpy()
+    
+    # The audio tensor may have a batch dimension, so squeeze if necessary
+    audio_data = audio_tensor.squeeze()  # Shape will be (n_samples,)
+    
+    # Save the audio data to a file using scipy
+    write(filename, output.sr, audio_data)
+
+
+def on_queue_update(update):
+    if isinstance(update, fal_client.InProgress):
+        for log in update.logs:
+           print(log["message"])
+
+
+def generate_tts_outer(input_text,voice_id=0,gender="female",save_path = "./static/samples"):
+    from outetts.v0_1.interface import InterfaceHF, InterfaceGGUF    
+    
+    # Initialize the interface with the Hugging Face model
+    interface_oute_tts = InterfaceHF("OuteAI/OuteTTS-0.1-350M")
+    
+    if gender=='male':
+        voice=male_voices[voice_id%len(male_voices)]
+    else:
+        voice=female_voices[voice_id%len(female_voices)]
+    txt_file=voice.replace(".wav","_transcript.txt")
+        
+    
+    # Create a custom speaker from an audio file
+    speaker = interface_oute_tts.create_speaker(
+        voice,
+        open(txt_file).read()
+    )
+
+    # Generate TTS with the custom voice
+    output = interface_oute_tts.generate(
+        text=input_text,
+        speaker=speaker,
+        temperature=0.1,
+        repetition_penalty=1.1,
+        max_lenght=4096
+    )
+    
+    filename=generate_filename()
+    
+    full_path=os.path.join(save_path,filename)
+    
+    #return output
+    save_audio(output,full_path)
+    
+    return full_path
+
+
 
 
 def setup(**kwargs):

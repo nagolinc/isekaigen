@@ -12,7 +12,10 @@ def chat(
     history=None,
     json_mode=False,
     #model="gemini-1.5-flash",
-    model="gemini-1.5-pro",
+    #model="gemini-1.5-pro",#
+    model="gemini-1.5-pro-002",
+    #model="gemini-1.5-flash-002",
+    #model="gemini-1.5-flash-8b-exp-0924",
     max_history=8,
 ):
 
@@ -29,8 +32,10 @@ def chat(
     generation_config = {
         "temperature": 1,
         "top_p": 0.95,
-        "top_k": 64,
-        "max_output_tokens": 16384,
+        #"top_k": 64,
+        "top_k": 40,
+        #"max_output_tokens": 16384,
+        "max_output_tokens": 8192,
         "response_mime_type": response_format,
     }
 

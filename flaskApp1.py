@@ -1,14 +1,24 @@
 from chat_openai import chat as chatJ
-from chat_openai import chat
+#from chat_xai import chat as chatJ
+#from chat_fireworks import chat as chatJ
+from chat_xai import chat
 #from chat_openai4 import chat
 #from chat_anthropic import chat
 #from chat_deepseek import chat
 #from chat_openrouter import chat#doesn't seem to work (nous returns noting, llama3 ignores json mode)
 #from chat_fireworks import chat#meh (405b is better, but $$$)
 #from chat_gemini import chat#something wrong with json mode
+#from chat_together import chat#doesn't let you have enough tokens
 
 from comfy import generate_comfy
-from generation_api import generate_tts, generate_image
+#from generation_api import generate_tts, generate_image
+from generation_api import generate_tts
+#from generation_api import generate_tts_fal as generate_tts
+#from generation_api import tts_fish as generate_tts #nice to have better voices, but occasionally drops words
+#from generation_api import generate_tts_outer as generate_tts #even worse
+from generate_image_together import generate_image
+
+
 import json
 import concurrent.futures
 import threading
@@ -30,8 +40,25 @@ def do_generate_image(text_to_image_caption):
         image_filename=generate_image(text_to_image_caption)
     return image_filename
 
+import os
+
+script_filepath=None
 
 def make_story(story_intro, num_episodes=None,history=None):
+    global script_filepath
+    
+    #script_filepath=scripts/{datetime}-{story_intro}
+    #remove charcters that are not a-zA-Z0-9 from story_intro
+    story_intro_abc=re.sub(r'[^a-zA-Z0-9]', '_', story_intro)[:50]
+    formatted_datetime=datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    
+    script_filepath=f"scripts/{formatted_datetime}-{story_intro_abc}.txt"
+    os.makedirs("scripts",exist_ok=True)
+    with open(script_filepath, "a",encoding="utf-8") as f:
+        f.write(story_intro)
+        f.write("\n---\n\n")
+        
+    
     
     #generate unique id {datetime}-{story_intro}
     #remove anything not a-zA-Z0-9
@@ -50,6 +77,10 @@ def make_story(story_intro, num_episodes=None,history=None):
     #generate title,author
     instructions='''
     generate a title and author for the given story.
+    
+    Make sure to include the correct author.  So if the plot says "Story is written in the style of Issac Asimov" the author should be "Issac Asimov"
+    
+    
     return your response as JSON formatted like so
     {
         "title":"The story of the magic sword",
@@ -141,14 +172,22 @@ def make_story(story_intro, num_episodes=None,history=None):
 
 
     #episodes
+    episodes_instruction=RNG()
     
-    episodes_instruction =f"you are making a story based on the idea {story_intro}."
+    episodes_instruction +=f"you are making a story based on the idea {story_intro}."
 
     episodes_instruction+=f"Now generate a list of episodes for the story.  Try to aim for about {num_episodes} episodes."
     
-    system_prompt_generateEpisodes=open(args.system_prompt_generateEpisodes, "r").read()
+    system_prompt_generateEpisodes = open(args.system_prompt_generateEpisodes, "r", encoding="utf-8").read()
     
     episodes_instruction+="\n"+system_prompt_generateEpisodes
+    
+    if args.reminders_generate_episodes is not None:
+        episodes_instruction+="\n"+open(args.reminders_generate_episodes).read()
+    
+    
+    
+    print("ABOUT TO DIE",episodes_instruction)
     
     def nlen(l):
         if l is None:
@@ -159,6 +198,13 @@ def make_story(story_intro, num_episodes=None,history=None):
 
     episodes_text,history = chat(episodes_instruction,system_prompt=system_prompt_generateEpisodes,history=history)
     print(episodes_text)
+    
+    #print(history)
+    
+    with open(script_filepath, "a",encoding="utf-8") as f:
+        f.write(episodes_text)
+        f.write("\n---\n\n")
+        
 
     system_prompt_jsonEpisodes=open("system_prompt_jsonEpisodes.txt", "r").read()
     
@@ -181,6 +227,7 @@ def make_story(story_intro, num_episodes=None,history=None):
     # Setup an initial history
     # Initial script and history setup
     script_data, history, json_history = generateScript(episodes[0], story_intro+extra_info,character_info, history)
+    
     
     #add script_data["characters"] to characters
     if "characters" in script_data:
@@ -210,7 +257,10 @@ This FIRST LINE of DIALOGUE must BOTH explicity describe what happened in the la
 """
         
         if i == len(episodes) - 1:
-            extra_info += "This is the final episode, so be sure to wrap things up.  Keep in mind, the story need not have a happy ending."
+            #extra_info += "This is the final episode, so be sure to wrap things up.  Keep in mind, the story need not have a happy ending."
+            extra_info += "This is the final episode, so give the story a satisfying conclusion."
+            if args.reminder_final_episode is not None:
+                extra_info += open(args.reminder_final_episode,'r',encoding='utf-8').read()
         else:
             extra_info += "Make sure to maintain continuity with the previous episodes and advance the main plot."
     
@@ -311,10 +361,21 @@ def process_shots(script_data, shot_queue):
         shot_queue.put(shot)  # Process each shot and put it into the queue
         
         
-system_prompt_write_script=open("system_prompt_write_script.txt", "r").read()        
+
+
+historyJ=None
                 
 def generateScript(episode,story_intro,character_info,history,json_history=None):
-    instructions=f"""
+    global historyJ
+    
+    instructions=RNG()
+    
+    if args.reminder_generate_script is not None:
+        reminder_generate_script=open(args.reminder_generate_script).read()
+    else:
+        reminder_generate_script=""
+    
+    instructions+=f"""
     
     You are writing episodes for an story based on the idea {story_intro}.
     
@@ -332,19 +393,35 @@ def generateScript(episode,story_intro,character_info,history,json_history=None)
     Reminder: When the characters encounter a new location, character, or item, one of them should describe it's physical appearance.
     Reminder: Make sure to use the characters' unique abilities and items, especially the main characcter's unique trais.
     Reminder: The script should begin with a list of characters including their names and physical descriptions.
-        
+    {reminder_generate_script}    
     """
     
     print("generating script for",episode["title"],"with character info",character_info,"history len",len(history))
             
-    script,history = chat(instructions,system_prompt=system_prompt_write_script,history=history)
+    try:
+        script,history = chat(instructions,system_prompt=system_prompt_write_script,history=history)
+    except Exception as e:
+        print("ERRROR",e,"using fallback")
+        print("\n\n\n====",instructions,system_prompt_write_script,history,"===\n\n\n")
+        
+        script,historyJ = chatJ(instructions,system_prompt=system_prompt_write_script,history=historyJ)
+    
+    
+    #write script to file
+    with open(script_filepath, "a",encoding="utf-8") as f:
+        f.write("episode "+str(episode["episode_number"])+" "+episode["title"]+"\n")
+        f.write(episode["description"]+"\n")
+        f.write(script)
+        f.write("\n\n---\n\n")
+    
     
     print("generated script>>>\n",script)
     
     reminder="""
-    Reminder: Follow the input SCRIPT AS CLOSELY AS POSSIBLE.  That means *each* line in the script should have a corresponding script in your JSON
+    Reminder: Follow the input SCRIPT AS CLOSELY AS POSSIBLE.  That means *EVERY SINGLE* line in the script should have a corresponding script in your JSON
+    Lines that contain dialogue should be in the "dialogue" field of the JSON
+    lines that describe action should be narrated using the "narration" field of the JSON
     Reminder: Make sure to include ALL characters at the beginning of the json in the "characters" field.  Each script has AT LEAST 3 characters.
-    Reminder: Avoid references to technical aspects of the script like "scene" "camera" or "episode"
     """
     
     if args.extra_episode_to_json_reminders:
@@ -353,6 +430,7 @@ def generateScript(episode,story_intro,character_info,history,json_history=None)
     
     
     
+    '''
     #convert script to JSON
     print("converting script to JSON")
     jsonScript,jsonHistory = chatJ(character_info+script+reminder,
@@ -360,8 +438,40 @@ def generateScript(episode,story_intro,character_info,history,json_history=None)
                                   history=json_history,
                                   json_mode=True)
     print("jsonScript",jsonScript)
-    
     scriptData=json.loads(jsonScript)                
+    '''
+    
+    
+    MAX_CHUNK_SIZE=9999
+    
+    #split script into chunks
+    script_lines=script.split("\n")
+    script_chunks=["\n".join(script_lines[i:i+MAX_CHUNK_SIZE]) for i in range(0, len(script_lines), MAX_CHUNK_SIZE)]
+    
+    scriptData={"setting":"","characters":[],"shots":[]}
+    seen_characters=set()
+    
+    for chunk_num, this_chunk in enumerate(script_chunks):
+        jsonScript,jsonHistory = chatJ(character_info+this_chunk+reminder,
+                                      system_prompt=system_prompt_episodeToJson,
+                                      history=json_history,
+                                      json_mode=True)
+        print("doing chunk",chunk_num,"/",len(script_chunks))
+        #print("jsonScript",jsonScript)
+        this_scriptData=json.loads(jsonScript)
+        if "setting" in this_scriptData:
+            scriptData["setting"]=this_scriptData["setting"]
+        if "characters" in this_scriptData:
+            for chacter in this_scriptData["characters"]:
+                if "name" in chacter and chacter["name"] not in seen_characters:
+                    seen_characters.add(chacter["name"])
+                    scriptData["characters"].append(chacter)
+        if "shots" in this_scriptData:
+            scriptData["shots"]+=this_scriptData["shots"]
+            
+            
+    #print scriptData(with indentation)
+    print(json.dumps(scriptData,indent=4))
     
     return scriptData,history, jsonHistory
 
@@ -369,17 +479,22 @@ def generateScript(episode,story_intro,character_info,history,json_history=None)
 
 import concurrent.futures
 
+char_dict = {}
+
 def generateShots(scriptData):
     for shot in scriptData["shots"]:
         print("generating shot", shot)
         
+        if "caption" not in shot:
+            print("THIS SHOULD NEVER HAPPEN, NO CAPTION IN SHOT", shot)
+            shot["caption"] = "a dark figure stands in the shadows"
+        
         text_to_image_caption = args.promptPrefix+shot["caption"] + args.promptSuffix
         
-        char_dict = {}
         if "characters" in scriptData:
             # Convert from a [{name:, description:}] to a dictionary
             for character in scriptData["characters"]:
-                if "name" in character:
+                if "name" in character and character["name"] not in char_dict:
                     char_dict[character["name"]] = character["description"]
         
         # Add character info to shot if it exists
@@ -387,10 +502,15 @@ def generateShots(scriptData):
             for character in shot["characters"]:
                 if isinstance(character, str) and character in char_dict:
                     text_to_image_caption += "\n" + char_dict[character]
+                else:
+                    print("Character not found in dictionary:", character)
         
         # Add setting
         if "setting" in shot:
             text_to_image_caption += "\n" + shot["setting"]
+            
+        if "female_eye_candy" in shot:
+            text_to_image_caption += "\n" + shot["female_eye_candy"]
         
         with concurrent.futures.ThreadPoolExecutor() as executor:
             # Submit the image generation task
@@ -436,9 +556,12 @@ def generateShots(scriptData):
                 speaker_line=shot["narration"]
                 speaker_gender="female"
                 
-                audio_future = executor.submit(generate_tts, line)
+                tts_line=convert_all_caps_to_capital_case(shot["narration"])
+                
+                audio_future = executor.submit(generate_tts, tts_line)
             else:
                 line = shot["caption"]
+                tts_line=convert_all_caps_to_capital_case(shot["caption"])
                 audio_future = executor.submit(generate_tts, line)
             
             # Wait for both tasks to complete
@@ -543,7 +666,7 @@ def random_plot(samples=None):
     keywords=[]
     for filename in args.wordlists:
         if filename.endswith(".txt"):
-            lines=[line.strip() for line in open(filename).readlines()]
+            lines=[line.strip() for line in open(filename,'r',encoding='utf-8').readlines()]
         else:
             lines=[filename]
         keywords+=[random.choice(lines)]
@@ -553,14 +676,19 @@ def random_plot(samples=None):
     
     if samples is None:
         samples = open(args.samplePlots).read()
-    random_plot_system_prompt = open("random_plot_system_prompt.txt").read()
+    random_plot_system_prompt = open(args.random_plot_system_prompt).read()
     
     result,history= chat(keyword_string, system_prompt=random_plot_system_prompt+samples,json_mode=True)
+    #result,history= chat(keyword_string, system_prompt=random_plot_system_prompt+samples,json_mode=False)
     
     print(history)
     
     print(result)
-    return json.loads(result)["plot"]
+    try:
+        plot=json.loads(result)["plot"]
+    except:
+        plot=result
+    return plot
 
 
 
@@ -590,7 +718,21 @@ def get_shot():
 #/play_story needs to render templates/play_saved_story.html
 @app.route("/play_story", methods=["GET"])
 def play_story():
-    return render_template("play_saved_story.html")        
+    return render_template("play_saved_story.html")      
+
+
+def RNG(k=6):
+    keywords=[]
+    for i in range(k):
+        for filename in args.rng_keyword_files:
+            if filename.endswith(".txt"):
+                lines=[line.strip() for line in open(filename).readlines()]
+            else:
+                lines=[filename]
+            keywords+=[random.choice(lines)]
+        
+    keyword_string=" ".join(keywords)
+    return "RNG: "+keyword_string
         
 if __name__ == "__main__":
     
@@ -643,17 +785,38 @@ if __name__ == "__main__":
     #--extra_episode_to_json_reminders (default none)
     parser.add_argument("--extra_episode_to_json_reminders", default=None, type=str, help="Extra episode to JSON reminders")
     
+    #"system_prompt_write_script.txt"
+    parser.add_argument("--system_prompt_write_script", default="system_prompt_write_script.txt", help="Write script prompt")
     
+    #reminder_final_episode (default None)
+    parser.add_argument("--reminder_final_episode", default=None, type=str, help="Reminder for final episode")
+    
+    #reminder_generate_script (default None)
+    parser.add_argument("--reminder_generate_script", default=None, type=str, help="Reminder for generating script")
+    
+    #reminders_generate_episodes (default None)
+    parser.add_argument("--reminders_generate_episodes", default=None, type=str, help="Reminders for generating episodes")
+    
+    #rng_keyword_files (default ["..\words\nouns.txt","..\words\names.txt"])
+    parser.add_argument("--rng_keyword_files", nargs="+", default=["../words/nouns.txt","../words/first_names2.txt"], help="RNG keyword files")
+    
+    #--random_plot_system_prompt "random_plot_system_prompt.txt"
+    parser.add_argument("--random_plot_system_prompt", default="random_plot_system_prompt.txt", help="Random plot system prompt")
     
     args = parser.parse_args()
+    
+    system_prompt_write_script=open(args.system_prompt_write_script, "r",encoding="utf-8").read()        
     
     system_prompt_episodeToJson=open(args.system_prompt_episodeToJson, "r").read()
 
     
-    system_prompt_generateEpisodes=open(args.system_prompt_generateEpisodes, "r").read()
+    system_prompt_generateEpisodes=open(args.system_prompt_generateEpisodes, "r",encoding="utf-8").read()
     
     system_prompt_isekai=open(args.system_prompt_isekai, "r").read()
     
+    
+    #test RNG
+    print(RNG())
     
     #generate test image
     if args.use_comfy:

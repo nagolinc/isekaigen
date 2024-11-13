@@ -13,6 +13,7 @@ client = openai.OpenAI(
 def chat(input_text, system_prompt="do your best", history=None, json_mode=False,
          #model="accounts/fireworks/models/llama-v3-8b-instruct",
          #model ="accounts/fireworks/models/llama-v3p1-70b-instruct",
+         #model="accounts/fireworks/models/llama-v3p2-90b-vision-instruct",
          model="accounts/fireworks/models/llama-v3p1-405b-instruct",
          #model="accounts/fireworks/models/mixtral-8x22b-instruct",#not good
          max_history=8):

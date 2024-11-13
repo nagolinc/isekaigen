@@ -1,3 +1,122 @@
+Speed running the multiverse is an isekai style anime.
+
+The protagonist Sam Hunter is a denzien of the celestial plane, an interdimesional realm that contains portals to various worlds in the multiverse.  Once day his girlfriend Jessica Sunshine abducted by the Obsidian Veil, a group of smugglers who travel from realm to realm smuggling various goods.
+
+The episode is episodic/formulaic with each episode following the same formula:
+
+At the start of the episode, Sam “beams down” into one of the universes (where he must start over at level 1)
+
+Sam levels up rapidly using his skills and knowledge (kind of like the ultimate video game player).
+
+Over the course of the episode, Sam fights various villains and bad guys while trying to find clues about Jessia and the Obsidian Veil.
+
+As a side effect of his actions, Sam ends up defeating various evil and corrupt powers in the world, making it a better place.
+
+Finally, at the end of the episode, Sam reaches level 100, discovers that “the princess is in another castle” and ascends back to the celestial plane.
+
+As he leaves, various people who were saved/rescued from terrible circumstances wish him well.
+
+Each scene in the episode must focus on traditional elements of power fantasy/wish fulfillment.
+
+That is to say, in each scene, ray must do one of the following:
+
+Defeat a overly confident villain who taunts him for being so week
+
+Unlocks a new skill or ability
+
+Discovers some vast treaure
+
+Recruits an ally (human, pet, etc)
+
+Levels up.
+
+Generally, the pacing should be so that Sam gains the first few levels slowly by by the end of the episode he his racing through levels so he can reach level 100 before the end of the episode (frequently in preparation for fighting a big bad)
+
+
+When writing the outline for an episode, write it as a series of scenes, taking care to note what level Sam reaches at the end of each scene.
+
+In each scene, make sure to note: what skill or treasure Sam unlocks.  What enemy he defeats.  What level he reaches.  Make sure to give names to any allies or pets as well as significant enemies.
+
+For example,
+
+Here's a plot outline for Episode 1 of "Speed Running the Multiverse":
+Title: "The Dragon King's Dungeon"
+Opening: Sam Hunter arrives in a medieval fantasy world, materializing in a forest clearing. He's at Level 1 and must start from scratch.  He befriends a girl name Emma.
+Tutorial Quest: Sam encounters a weak slime monster. He defeats it easily using the most basic martial skill: “fighter punch” and reaches level 2.
+Village in Peril: Sam reaches a village terrorized by bandits. He takes on a quest to defeat them.  As he fights each of the bandits, they underestimate him because he is only level 2, but he quickly copies various skills from them and levels up, reaching level 8 by the end of the fight.  The bandits display visible shock every time he levels up.
+Bandit Camp Raid: Sam infiltrates the bandit camp, using stealth and wit. He discovers a magical amulet, unlocking magical abilities: summon fireball and summon water ball. Level 10
+Tavern Scene: Celebrating his victory, Sam gathers information about the world and hears rumors of the Dragon King's tyranny. A knight named Magnus joins he and Emma’s party.  Level 15
+Skill Training Montage: Sam rapidly levels up by completing various side quests, each focusing on different skills and abilities. Level 20
+Dungeon Crawl: Sam Emma and Magnus enter the Dragon King's dungeon, facing increasingly difficult monsters and traps. Level 25
+Rival Encounter: In the dungeon, Sam meets an arrogant adventurer named Carl who mocks his low level. Sam defeats him in a duel, gaining respect and leveling up significantly. Level 50
+Hidden Treasury: Sam discovers a secret room filled with gold and magical items, boosting his power dramatically. Level 90.
+Boss Battle Preparation: Racing against time, Sam power-levels through the final floors of the dungeon, reaching Level 99.
+Dragon King Showdown: Sam faces the Dragon King, a corrupt tyrant oppressing the realm. Using all his accumulated skills and knowledge, Sam defeats him, reaching Level 100.
+Ascension: As Sam prepares to leave, grateful villagers and his fairy companion bid him farewell. He finds a cryptic clue about the Obsidian Veil but realizes Jessica isn't here.
+Closing: Sam returns to the Celestial Plane, ready for his next adventure, while the fantasy world celebrates its newfound freedom.
+
+
+When writing the script, try to keep with the overall genere:
+*Sam starts out weak but with a lot of potential
+*Over the top villains who are always underestimating him
+*Sam rapidly levels up and gains new skills items and abilities
+
+Here is an example script:
+
+
+```
+Scene: Monster Meadow Mayhem
+
+Opening: Sam materialized in a vibrant green meadow, blinking against the sudden shift from the Celestial Plane. Towering trees dotted the landscape, and strange, colorful creatures roamed freely. Unlike any medieval fantasy world he’d visited, this place hummed with a different kind of energy. A small, furry creature with oversized eyes scampered past, chirping melodically. It vanished into a bush, leaving a trail of glittering sparkles.
+
+“Okay, not a standard sword-and-sorcery deal,” Sam muttered, activating his multiversal translator. A stream of information flooded his mind – this world revolved around capturing and training these fantastical creatures, called “Monsties.” People battled using their Monsties, forming bonds and growing stronger together.
+
+“Interesting,” Sam mused, his gamer instincts tingling. “Looks like I need to catch one of these Monsties if I want to get anywhere.”
+
+As if on cue, the furry creature popped back out of the bushes. It tilted its head, studying Sam with curiosity.
+
+“Hello there, little guy,” Sam greeted, approaching slowly. He extended his hand, palm open. “Want to be friends?”
+
+The creature hesitated for a moment, then hopped onto Sam’s outstretched hand. It nuzzled his fingers, letting out a happy chirp. A notification flashed before Sam’s eyes: Monstie acquired: Flufflepuff. Level 1.
+
+“Flufflepuff, huh? Cute.” Sam grinned. He felt a surge of power, his own level rising. Level Up: Level 1 -> Level 2. “Perfect timing.”
+
+Just then, a booming laugh echoed across the meadow. A figure clad in gaudy, mismatched armor stomped into view, wielding a comically oversized net.
+
+“Well, well, well! Look what we have here – a newbie and a pathetic Flufflepuff! Perfect for my collection!” The newcomer sneered, striking a dramatic pose. His name tag shimmered above his head: “Baron Von Nettingham, Level 10.”
+
+“Baron Von Nettingham?” Sam chuckled. “Seriously?”
+
+“Silence, weakling!” Von Nettingham bellowed. “Prepare to have your Monstie stolen!” He threw his net, aiming to capture Flufflepuff.
+
+“Flufflepuff, dodge!” Sam commanded. The little creature zipped out of the way with surprising speed.
+
+“What?!” Von Nettingham sputtered, his confidence shaken. “A Level 2 Flufflepuff dodged my expert net-throwing technique? Impossible!”
+
+Sam grinned. “You underestimate the power of friendship, Baron. Flufflepuff, use… uh… Fluffy Tackle!”
+
+Flufflepuff, glowing with a faint light, charged at Von Nettingham, slamming into his legs with unexpected force. The Baron stumbled, his armor rattling.
+
+Baron Von Nettingham: HP -5
+
+“Gah! That tickles!” Von Nettingham shrieked. He swatted at Flufflepuff, but the little creature was too agile.
+
+“Keep it up, Flufflepuff!” Sam cheered.
+
+Flufflepuff continued its assault, bouncing off Von Nettingham like a furry pinball. With each hit, Von Nettingham's HP dropped, and Sam felt another surge of power.
+
+Level Up: Level 2 -> Level 3.
+
+Von Nettingham’s eyes widened in disbelief. “He’s… he’s leveling up mid-battle? What kind of sorcery is this?!”
+
+“It’s called ‘having a good time’,” Sam replied, grinning.
+
+Finally, with one last Fluffy Tackle, Von Nettingham crumpled to the ground, defeated. He vanished in a puff of smoke, leaving behind a small pile of glittering coins.
+
+End of Scene: Sam, now Level 3, scooped up the coins and patted Flufflepuff on the head. “Good job, buddy. Now, let’s see where this adventure takes us.” He glanced up at the sky, a determined glint in his eyes. The hunt for Jessica, and the Obsidian Veil, was on.
+```
+
+
 you are a skilled writing assistant, you avoid cliched writing. you make sure to vary the length and type of paragraph to create 'visually appealing' writing. you avoid trite endings or cliched dialogue.
 
 when writing, every scene will include more than one character, and there will be dialogue between the characters.
