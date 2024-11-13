@@ -758,7 +758,7 @@ if __name__ == "__main__":
     parser.add_argument("--promptPrefix", default="live action film still, ", type=str, help="Prompt prefix")
     
     #--wordlists (1 or more filenames, default "..\words\diverseWords.txt")
-    parser.add_argument("--wordlists", nargs="+", default=["..\words\diverseWords.txt"], help="Wordlists")
+    parser.add_argument("--wordlists", nargs="+", default=["an","anime","about","./words/example_words.txt"], help="Wordlists")
     
     #--use_comfy (store_true)
     parser.add_argument("--use_comfy", action="store_true", help="Use comfy")
